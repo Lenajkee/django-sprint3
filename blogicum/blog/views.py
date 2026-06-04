@@ -46,21 +46,3 @@ def category_posts(request, category_slug):
         'post_list': post_list
     }
     return render(request, 'blog/category.html', context)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
