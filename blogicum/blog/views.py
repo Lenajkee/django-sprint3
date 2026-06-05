@@ -1,45 +1,35 @@
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
+from django.shortcuts import get_object_or_404, render
 
-from .models import Post, Category
+from .models import Category
+from .utils import get_posts
 
-
-def posts():
-    """Получение постов из БД"""
-    return Post.objects.select_related(
-        'category',
-        'location',
-        'author'
-    ).filter(
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=timezone.now()
-    )
+POSTS_COUNT_ON_INDEX = 5
 
 
 def index(request):
-    """Главная страница"""
+    """Главная страница."""
+    post_list = get_posts().order_by('-pub_date')[:POSTS_COUNT_ON_INDEX]
     return render(
         request,
         'blog/index.html',
-        {'post_list': posts().order_by('-pub_date')[:5]}
+        {'post_list': post_list}
     )
 
 
-def post_detail(request, pk):
-    """Отображение полного описания выбранной записи"""
-    post = get_object_or_404(posts(), pk=pk)
+def post_detail(request, post_id):
+    """Отображение полного описания выбранной записи."""
+    post = get_object_or_404(get_posts(), pk=post_id)
     return render(request, 'blog/detail.html', {'post': post})
 
 
 def category_posts(request, category_slug):
-    """Отображение публикаций категории"""
+    """Отображение публикаций категории."""
     category = get_object_or_404(
         Category,
         slug=category_slug,
         is_published=True
     )
-    post_list = posts().filter(category=category).order_by('-pub_date')
+    post_list = get_posts().filter(category=category).order_by('-pub_date')
 
     context = {
         'category': category,

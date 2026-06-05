@@ -3,8 +3,11 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+MAX_LENGTH_TITLE = 256
+MAX_STR_OUTPUT_LENGTH = 15
 
-class BaseModel(models.Model):
+
+class PublishedCreatedModel(models.Model):
     """Абстрактная модель. Добавляет флаг публикации и дату создания."""
 
     is_published = models.BooleanField(
@@ -21,8 +24,11 @@ class BaseModel(models.Model):
         abstract = True
 
 
-class Category(BaseModel):
-    title = models.CharField(max_length=256, verbose_name='Заголовок')
+class Category(PublishedCreatedModel):
+    title = models.CharField(
+        max_length=MAX_LENGTH_TITLE,
+        verbose_name='Заголовок'
+    )
     description = models.TextField(verbose_name='Описание')
     slug = models.SlugField(
         unique=True,
@@ -38,23 +44,26 @@ class Category(BaseModel):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.title
+        return self.title[:MAX_STR_OUTPUT_LENGTH]
 
 
-class Location(BaseModel):
-    name = models.CharField(max_length=256, verbose_name='Название места')
+class Location(PublishedCreatedModel):
+    name = models.CharField(
+        max_length=MAX_LENGTH_TITLE,
+        verbose_name='Название места'
+    )
 
     class Meta:
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
     def __str__(self):
-        return self.name
+        return self.name[:MAX_STR_OUTPUT_LENGTH]
 
 
-class Post(BaseModel):
+class Post(PublishedCreatedModel):
     title = models.CharField(
-        max_length=256,
+        max_length=MAX_LENGTH_TITLE,
         verbose_name='Заголовок'
     )
     text = models.TextField(
@@ -91,4 +100,4 @@ class Post(BaseModel):
         verbose_name_plural = 'Публикации'
 
     def __str__(self):
-        return self.title
+        return self.title[:MAX_STR_OUTPUT_LENGTH]
